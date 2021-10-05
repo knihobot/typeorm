@@ -5,11 +5,18 @@ import {camelCase} from "../util/StringUtils";
 import * as yargs from "yargs";
 import chalk from "chalk";
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
+import { Connection } from "../connection/Connection";
 
 /**
  * Generates a new migration file with sql needs to be executed to update schema.
  */
 export class MigrationGenerateCommand implements yargs.CommandModule {
+
+	connection?: Connection;
+
+	constructor (connection?: Connection) {
+		this.connection = connection
+	}
 
     command = "migration:generate";
     describe = "Generates a new migration file with sql needs to be executed to update schema.";
@@ -100,7 +107,7 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
 
             const upSqls: string[] = [], downSqls: string[] = [];
 
-            const connection = await createConnection(connectionOptions);
+            const connection = this.connection ? this.connection : await createConnection(connectionOptions);
             try {
                 const sqlInMemory = await connection.driver.createSchemaBuilder().log();
 
